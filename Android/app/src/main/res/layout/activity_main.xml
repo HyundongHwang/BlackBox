@@ -26,6 +26,17 @@
             android:layout_height="wrap_content"
             android:text="save session" />
 
+        <Button
+            android:id="@+id/btn_screen_capture"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="capture screen" />
+
+        <TextView
+            android:id="@+id/tv_current_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </ScrollView>

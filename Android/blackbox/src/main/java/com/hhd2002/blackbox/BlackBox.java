@@ -1,12 +1,23 @@
 package com.hhd2002.blackbox;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 
+import com.microsoft.azure.storage.AccessCondition;
 import com.microsoft.azure.storage.CloudStorageAccount;
+import com.microsoft.azure.storage.blob.BlobContainerPermissions;
+import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
+import com.microsoft.azure.storage.blob.BlobProperties;
+import com.microsoft.azure.storage.blob.CloudBlobClient;
+import com.microsoft.azure.storage.blob.CloudBlobContainer;
+import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
 import com.microsoft.azure.storage.table.TableEntity;
@@ -14,6 +25,10 @@ import com.microsoft.azure.storage.table.TableOperation;
 import com.microsoft.azure.storage.table.TableQuery;
 import com.microsoft.azure.storage.table.TableServiceEntity;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Date;
@@ -27,7 +42,7 @@ public class BlackBox {
     }
 
     private static Context _context = null;
-    private static CopyOnWriteArrayList<LevelAndLog> _logCache4Azure = new CopyOnWriteArrayList<LevelAndLog>();
+    private static CopyOnWriteArrayList<LevelAndLog> _logCache4Azure = new CopyOnWriteArrayList<>();
     private static String _azureStorageConnectionString;
 
     @SuppressLint("StaticFieldLeak")
@@ -203,10 +218,53 @@ public class BlackBox {
     }
 
 
+    @SuppressLint("StaticFieldLeak")
+    public static void captureScreen(Activity activity) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                try {
+                    Date now = new Date();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd-hhmmss");
+                    String dateTimeStr = sdf.format(now);
+                    String newFileName = String.format("blackbox-screencapture-%s-%s.png", _getHwId(activity), dateTimeStr);
+                    File newFile = new File(activity.getExternalCacheDir(), newFileName);
+                    View rootView = activity.getWindow().getDecorView().getRootView();
+                    rootView.setDrawingCacheEnabled(true);
+                    Bitmap bitmap = Bitmap.createBitmap(rootView.getDrawingCache());
+                    rootView.setDrawingCacheEnabled(false);
+                    FileOutputStream outputStream = new FileOutputStream(newFile);
+                    int quality = 100;
+                    bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
 
+                    CloudStorageAccount storageAccount = CloudStorageAccount.parse(_azureStorageConnectionString);
+                    CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+                    CloudBlobContainer container = blobClient.getContainerReference("screencapture");
+                    boolean res = container.createIfNotExists();
+                    BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
+                    containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
+                    container.uploadPermissions(containerPermissions);
+                    CloudBlockBlob blob = container.getBlockBlobReference(newFileName);
+                    FileInputStream newFileInStream = new FileInputStream(newFile);
+                    blob.upload(newFileInStream, newFile.length());
+                    newFileInStream.close();
+                    BlobProperties prop = blob.getProperties();
+                    prop.setContentType("image/png");
+                    blob.uploadProperties();
 
+                    String imgFilePath = newFile.getAbsolutePath();
+                    String imgUrl = blob.getUri().toString();
+                    BlackBox.i("CAPTURESCREEN %s : %s", imgFilePath, imgUrl);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
 
-
+                return null;
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
 
     private static String _getHwId(Context context) {
@@ -214,7 +272,6 @@ public class BlackBox {
         if (context == null) {
             return "contextisnull";
         }
-
 
 
         @SuppressLint("HardwareIds")
