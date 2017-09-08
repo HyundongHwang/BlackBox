@@ -19,6 +19,10 @@ hs_err_pid*
 
 
 
+*/packages/*
+*/*/packages/*
+*/*/*/packages/*
+
 */build/*
 */*/build/*
 */*/*/build/*
