@@ -23,10 +23,21 @@ hs_err_pid*
 */*/build/*
 */*/*/build/*
 
-*.idea*
-*.iml
-
-/.gradle/*
 */.gradle/*
 */*/.gradle/*
 */*/*/.gradle/*
+
+*/obj/*
+*/*/obj/*
+*/*/*/obj/*
+
+*/bin/*
+*/*/bin/*
+*/*/*/bin/*
+
+*/.vs/*
+*/*/.vs/*
+*/*/*/.vs/*
+
+*.idea*
+*.iml
