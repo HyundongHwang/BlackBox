@@ -5,12 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 
-import com.microsoft.azure.storage.AccessCondition;
 import com.microsoft.azure.storage.CloudStorageAccount;
 import com.microsoft.azure.storage.blob.BlobContainerPermissions;
 import com.microsoft.azure.storage.blob.BlobContainerPublicAccessType;
@@ -20,21 +18,20 @@ import com.microsoft.azure.storage.blob.CloudBlobContainer;
 import com.microsoft.azure.storage.blob.CloudBlockBlob;
 import com.microsoft.azure.storage.table.CloudTable;
 import com.microsoft.azure.storage.table.CloudTableClient;
-import com.microsoft.azure.storage.table.TableEntity;
 import com.microsoft.azure.storage.table.TableOperation;
 import com.microsoft.azure.storage.table.TableQuery;
-import com.microsoft.azure.storage.table.TableServiceEntity;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BlackBox {
+
+    public static final String _SCREEN_CAPTURE_FILE_PREFIX = "blackbox-screencapture";
 
     public static class LevelAndLog {
         public String level;
@@ -130,6 +127,56 @@ public class BlackBox {
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                while (true) {
+                    try {
+                        File externalCacheDir = _context.getExternalCacheDir();
+                        File[] files = externalCacheDir.listFiles();
+
+                        for (File file: files) {
+                            if (!file.getName().contains(_SCREEN_CAPTURE_FILE_PREFIX))
+                                continue;
+
+                            int idx = _SCREEN_CAPTURE_FILE_PREFIX.length() + 1;
+                            String dateStr = file.getName().substring(idx, idx + 6);
+                            idx = idx + 6 + 1;
+                            String timeStr = file.getName().substring(idx, idx + 6);
+
+                            CloudStorageAccount storageAccount = CloudStorageAccount.parse(_azureStorageConnectionString);
+                            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+                            CloudBlobContainer container = blobClient.getContainerReference("screencapture");
+                            boolean res = container.createIfNotExists();
+                            BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
+                            containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
+                            container.uploadPermissions(containerPermissions);
+
+                            String blobName = String.format("%s/%s/%s-%s.png", _getHwId(_context), dateStr, _SCREEN_CAPTURE_FILE_PREFIX, timeStr);
+                            CloudBlockBlob blob = container.getBlockBlobReference(blobName);
+                            FileInputStream newFileInStream = new FileInputStream(file);
+                            blob.upload(newFileInStream, file.length());
+                            newFileInStream.close();
+                            BlobProperties prop = blob.getProperties();
+                            prop.setContentType("image/png");
+                            blob.uploadProperties();
+
+                            file.delete();
+                            String imgFilePath = file.getAbsolutePath();
+                            String imgUrl = blob.getUri().toString();
+                            BlackBox.i("CAPTURESCREEN %s : %s", imgFilePath, imgUrl);
+                        }
+
+                        Thread.sleep(3000);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @SuppressLint("HardwareIds")
@@ -219,15 +266,21 @@ public class BlackBox {
 
 
     @SuppressLint("StaticFieldLeak")
+    public static void captureScreen(View view) {
+    }
+
+    @SuppressLint("StaticFieldLeak")
     public static void captureScreen(Activity activity) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 try {
                     Date now = new Date();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd-hhmmss");
-                    String dateTimeStr = sdf.format(now);
-                    String newFileName = String.format("blackbox-screencapture-%s-%s.png", _getHwId(activity), dateTimeStr);
+                    SimpleDateFormat sdfTime = new SimpleDateFormat("hhmmss");
+                    String timeStr = sdfTime.format(now);
+                    SimpleDateFormat sdfDate = new SimpleDateFormat("yyMMdd");
+                    String dateStr = sdfDate.format(now);
+                    String newFileName = String.format("%s-%s-%s.png", _SCREEN_CAPTURE_FILE_PREFIX, dateStr, timeStr);
                     File newFile = new File(activity.getExternalCacheDir(), newFileName);
                     View rootView = activity.getWindow().getDecorView().getRootView();
                     rootView.setDrawingCacheEnabled(true);
@@ -238,25 +291,6 @@ public class BlackBox {
                     bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream);
                     outputStream.flush();
                     outputStream.close();
-
-                    CloudStorageAccount storageAccount = CloudStorageAccount.parse(_azureStorageConnectionString);
-                    CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
-                    CloudBlobContainer container = blobClient.getContainerReference("screencapture");
-                    boolean res = container.createIfNotExists();
-                    BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
-                    containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
-                    container.uploadPermissions(containerPermissions);
-                    CloudBlockBlob blob = container.getBlockBlobReference(newFileName);
-                    FileInputStream newFileInStream = new FileInputStream(newFile);
-                    blob.upload(newFileInStream, newFile.length());
-                    newFileInStream.close();
-                    BlobProperties prop = blob.getProperties();
-                    prop.setContentType("image/png");
-                    blob.uploadProperties();
-
-                    String imgFilePath = newFile.getAbsolutePath();
-                    String imgUrl = blob.getUri().toString();
-                    BlackBox.i("CAPTURESCREEN %s : %s", imgFilePath, imgUrl);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
