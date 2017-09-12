@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BlackBox {
@@ -156,7 +157,8 @@ public class BlackBox {
                             idx = idx + 6 + 1;
                             String timeStr = file.getName().substring(idx, idx + 6);
 
-                            String blobName = String.format("%s/%s/%s-%s.png", _getHwId(_context), dateStr, _SCREEN_CAPTURE_FILE_PREFIX, timeStr);
+                            String uuidStr = UUID.randomUUID().toString().replace("-", "");
+                            String blobName = String.format("%s/%s/%s-%s-%s.png", _getHwId(_context), dateStr, _SCREEN_CAPTURE_FILE_PREFIX, timeStr, uuidStr);
                             CloudBlockBlob blob = container.getBlockBlobReference(blobName);
                             FileInputStream newFileInStream = new FileInputStream(file);
                             blob.upload(newFileInStream, file.length());

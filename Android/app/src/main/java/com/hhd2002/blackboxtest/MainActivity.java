@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.btn_save_session)
     public void onbtnSaveSessionClicked() {
-        BlackBox.session("h2d2002@naver.com");
+        BlackBox.session("h2d2002@naver.com from android");
     }
 
     @OnClick(R.id.btn_screen_capture)

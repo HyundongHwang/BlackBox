@@ -1,0 +1,1 @@
+cp *.nuspec ../BlackBox/ -Force -Recurse

@@ -106,7 +106,8 @@ namespace BlackBoxLib
                         idx = idx + 6 + 1;
                         var timeStr = fileName.Substring(idx, 6);
 
-                        var blobName = $"{_GetPcUniqueKey()}/{dateStr}/{_SCREEN_CAPTURE_FILE_PREFIX}-{timeStr}.png";
+                        var guidStr = Guid.NewGuid().ToString().Replace("-", "");
+                        var blobName = $"{_GetPcUniqueKey()}/{dateStr}/{_SCREEN_CAPTURE_FILE_PREFIX}-{timeStr}-{guidStr}.png";
                         var blob = container.GetBlockBlobReference(blobName);
                         blob.UploadFromFile(file);
                         blob.Properties.ContentType = "image/png";
