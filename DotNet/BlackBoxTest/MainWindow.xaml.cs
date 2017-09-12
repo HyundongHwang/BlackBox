@@ -24,6 +24,31 @@ namespace BlackBoxTest
         public MainWindow()
         {
             InitializeComponent();
+
+            this.BtnHello.Click += BtnHello_Click;
+            this.BtnWorld.Click += BtnWorld_Click;
+            this.BtnSession.Click += BtnSession_Click;
+            this.BtnCaptureScreen.Click += BtnCaptureScreen_Click;
+        }
+
+        private void BtnHello_Click(object sender, RoutedEventArgs e)
+        {
+            BlackBox.d("hello");
+        }
+
+        private void BtnWorld_Click(object sender, RoutedEventArgs e)
+        {
+            BlackBox.i("world");
+        }
+
+        private void BtnSession_Click(object sender, RoutedEventArgs e)
+        {
+            BlackBox.session("h2d2002@naver.com");
+        }
+
+        private void BtnCaptureScreen_Click(object sender, RoutedEventArgs e)
+        {
+            BlackBox.CaptureScreen();
         }
     }
 }

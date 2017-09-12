@@ -13,5 +13,10 @@ namespace BlackBoxTest
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            BlackBoxLib.BlackBox.Init(BlackBoxSecureKeys.AZURE_STORAGE_CONNECTION);
+        }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Management;
@@ -13,6 +16,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace BlackBoxLib
 {
@@ -24,127 +28,141 @@ namespace BlackBoxLib
             public string Log { get; set; }
         }
 
-        public static List<LogOutputDirections> _outputDirectionList { get; set; }
-
+        private const string _SCREEN_CAPTURE_FILE_PREFIX = "blackbox-screencapture";
         private static ConcurrentQueue<string> _logCache4File = new ConcurrentQueue<string>();
 
         private static ConcurrentQueue<LevelAndLog> _logCache4Azure = new ConcurrentQueue<LevelAndLog>();
 
         private static string _azureStorageConnectionString;
 
-        public static void Init(List<LogOutputDirections> outputDirectionList, string azureStorageConnectionString = null)
+        public static void Init(string azureStorageConnectionString = null)
         {
-            _outputDirectionList = outputDirectionList;
+            _azureStorageConnectionString = azureStorageConnectionString;
 
-            if (_outputDirectionList.Contains(LogOutputDirections.LocalFile))
+            TaskEx.Run(async () =>
             {
-                TaskEx.Run(async () =>
+                try
                 {
-                    // 로그로테이션 테스트 준비용 로그파일 무한생성 ps 스크립트
-                    // 00..99 | %{ cp Coconut.exe.log ("Coconut.exe_1702{0:D2}.log" -f $_) }
+                    var storageAccount = CloudStorageAccount.Parse(_azureStorageConnectionString);
+                    var tableClient = storageAccount.CreateCloudTableClient();
+                    var table = tableClient.GetTableReference($"log{_GetPcUniqueKey()}date{DateTime.Now.ToString("yyMMdd")}");
+                    var res = table.CreateIfNotExists();
+                    var query = new TableQuery<AzureTableLogEntity>();
+                    var maxRowKey = table.ExecuteQuery(query).Max(item => long.Parse(item.RowKey));
 
-                    var exePath = Assembly.GetEntryAssembly().Location;
-                    var exeDir = System.IO.Path.GetDirectoryName(exePath);
-                    var exeFileName = System.IO.Path.GetFileName(exePath);
-                    var logFileCount = Directory.GetFiles(exeDir, $"{exeFileName}_*.log").Count();
-
-                    if (logFileCount > 60)
+                    if (maxRowKey == null)
                     {
-                        var delLogFileList = Directory.GetFiles(exeDir, $"{exeFileName}_*.log").OrderBy(item => item).Take(logFileCount - 30);
-
-                        foreach (var delLogFile in delLogFileList)
-                        {
-                            File.Delete(delLogFile);
-                        }
+                        AzureTableLogEntity.LastRowKey = 0;
                     }
-
-                    while (true)
+                    else
                     {
-                        if (_logCache4File.Count == 0)
-                        {
-                            await TaskEx.Delay(TimeSpan.FromSeconds(10));
-                            continue;
-                        }
-
-                        _WriteLogToLocalFile();
+                        AzureTableLogEntity.LastRowKey = maxRowKey;
                     }
-                });
-            }
-
-
-
-            if (_outputDirectionList.Contains(LogOutputDirections.LocalSqliteDb))
-            {
-            }
-
-
-
-
-            if (_outputDirectionList.Contains(LogOutputDirections.AzureTable))
-            {
-                TaskEx.Run(async () =>
+                }
+                catch (Exception ex)
                 {
-                    _azureStorageConnectionString = azureStorageConnectionString;
+                    Trace.TraceError(ex.ToString());
+                }
 
-                    try
+                while (true)
+                {
+                    if (_logCache4Azure.Count == 0)
                     {
-                        var storageAccount = CloudStorageAccount.Parse(_azureStorageConnectionString);
-                        var tableClient = storageAccount.CreateCloudTableClient();
-                        var table = tableClient.GetTableReference($"log{_GetPcUniqueKey()}date{DateTime.Now.ToString("yyMMdd")}");
-                        var res = table.CreateIfNotExists();
-                        var query = new TableQuery<AzureTableLogEntity>();
-                        var maxRowKey = table.ExecuteQuery(query).Max(item => long.Parse(item.RowKey));
-
-                        if (maxRowKey == null)
-                        {
-                            AzureTableLogEntity.LastRowKey = 0;
-                        }
-                        else
-                        {
-                            AzureTableLogEntity.LastRowKey = maxRowKey;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceError(ex.ToString());
+                        await TaskEx.Delay(TimeSpan.FromSeconds(10));
+                        continue;
                     }
 
-                    while (true)
+                    _WriteLogToAzureTable();
+                }
+            });
+
+
+
+            TaskEx.Run(async () =>
+            {
+                var storageAccount = CloudStorageAccount.Parse(_azureStorageConnectionString);
+                var blobClient = storageAccount.CreateCloudBlobClient();
+                var container = blobClient.GetContainerReference("screencapture");
+                var res = container.CreateIfNotExists();
+                var containerPermissions = container.GetPermissions();
+                containerPermissions.PublicAccess = BlobContainerPublicAccessType.Container;
+                container.SetPermissions(containerPermissions);
+
+                var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var screencaptureDir = Path.Combine(exeDir, _SCREEN_CAPTURE_FILE_PREFIX);
+
+                while (true)
+                {
+                    var files = Directory.GetFiles(screencaptureDir);
+
+                    foreach (var file in files)
                     {
-                        if (_logCache4Azure.Count == 0)
-                        {
-                            await TaskEx.Delay(TimeSpan.FromSeconds(10));
+                        if (!file.Contains(_SCREEN_CAPTURE_FILE_PREFIX))
                             continue;
-                        }
 
-                        _WriteLogToAzureTable();
+                        var fileName = Path.GetFileNameWithoutExtension(file);
+                        var idx = _SCREEN_CAPTURE_FILE_PREFIX.Length + 1;
+                        var dateStr = fileName.Substring(idx, 6);
+                        idx = idx + 6 + 1;
+                        var timeStr = fileName.Substring(idx, 6);
+
+                        var blobName = $"{_GetPcUniqueKey()}/{dateStr}/{_SCREEN_CAPTURE_FILE_PREFIX}-{timeStr}.png";
+                        var blob = container.GetBlockBlobReference(blobName);
+                        blob.UploadFromFile(file);
+                        blob.Properties.ContentType = "image/png";
+                        blob.SetProperties();
+
+                        File.Delete(file);
+                        var imgFilePath = file;
+                        var imgUrl = blob.Uri.ToString();
+                        BlackBox.i($"CAPTURESCREEN {imgFilePath} : {imgUrl}");
                     }
-                });
-            }
 
+                    Thread.Sleep(3000);
+                }
+            });
 
 
 
         }
 
+        public static void CaptureScreen()
+        {
+            //Create a new bitmap.
+            var bmp = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
+                Screen.PrimaryScreen.Bounds.Height,
+                PixelFormat.Format32bppArgb);
+
+            // Create a graphics object from the bitmap.
+            var g = Graphics.FromImage(bmp);
+
+            // Take the screenshot from the upper left corner to the right bottom corner.
+            g.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
+                Screen.PrimaryScreen.Bounds.Y,
+                0,
+                0,
+                Screen.PrimaryScreen.Bounds.Size,
+                CopyPixelOperation.SourceCopy);
+
+            var exeDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var screencaptureDir = Path.Combine(exeDir, _SCREEN_CAPTURE_FILE_PREFIX);
+            var screencaptureFilePath = Path.Combine(screencaptureDir, $"{_SCREEN_CAPTURE_FILE_PREFIX}-{DateTime.Now.ToString("yyMMdd-HHmmss")}.png");
+
+            if (!Directory.Exists(screencaptureDir))
+            {
+                Directory.CreateDirectory(screencaptureDir);
+            }
+
+            // Save the screenshot to the specified path that the user has chosen.
+            bmp.Save(screencaptureFilePath, ImageFormat.Png);
+        }
+
         public static void Flush()
         {
-            if (_outputDirectionList.Contains(LogOutputDirections.LocalFile))
-            {
-                if (_logCache4File.Count == 0)
-                    return;
+            if (_logCache4Azure.Count == 0)
+                return;
 
-                _WriteLogToLocalFile();
-            }
-
-
-            if (_outputDirectionList.Contains(LogOutputDirections.AzureTable))
-            {
-                if (_logCache4Azure.Count == 0)
-                    return;
-
-                _WriteLogToAzureTable();
-            }
+            _WriteLogToAzureTable();
         }
 
         public static void e(string format, params object[] args)
@@ -251,46 +269,29 @@ namespace BlackBoxLib
             var nowDateTimeStr = DateTime.Now.ToString("yy/MM/dd|HH:mm:ss");
             var decoLog = $"[{logLevel}][{nowDateTimeStr}]{log}";
 
-            if (_outputDirectionList.Contains(LogOutputDirections.VsConsole))
+            try
             {
-                try
+                switch (logLevel)
                 {
-                    switch (logLevel)
-                    {
-                        case "ERROR":
-                            Trace.TraceError(log);
-                            break;
-                        case "WARNI":
-                            Trace.TraceWarning(log);
-                            break;
-                        case "INFOR":
-                        case "DEBUG":
-                        case "VERBO":
-                        default:
-                            Trace.TraceInformation(log);
-                            break;
-                    }
-                }
-                catch (Exception)
-                {
+                    case "ERROR":
+                        Trace.TraceError(log);
+                        break;
+                    case "WARNI":
+                        Trace.TraceWarning(log);
+                        break;
+                    case "INFOR":
+                    case "DEBUG":
+                    case "VERBO":
+                    default:
+                        Trace.TraceInformation(log);
+                        break;
                 }
             }
-
-            if (_outputDirectionList.Contains(LogOutputDirections.LocalFile))
-            {
-                var oneline = decoLog.Split("\r\n".ToArray()).FirstOrDefault();
-                var onelineunder100 = oneline.Substring(0, oneline.Length < 100 ? oneline.Length : 100);
-                _logCache4File.Enqueue(onelineunder100);
-            }
-
-            if (_outputDirectionList.Contains(LogOutputDirections.LocalSqliteDb))
+            catch (Exception)
             {
             }
 
-            if (_outputDirectionList.Contains(LogOutputDirections.AzureTable))
-            {
-                _logCache4Azure.Enqueue(new LevelAndLog { Level = logLevel, Log = log, });
-            }
+            _logCache4Azure.Enqueue(new LevelAndLog { Level = logLevel, Log = log, });
         }
 
         private static void _WriteLogToLocalFile()

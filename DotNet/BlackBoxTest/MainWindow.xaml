@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BlackBoxTest"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow"
+        Height="350"
+        Width="525">
+    <StackPanel>
+        <Button x:Name="BtnHello"
+                Content="hello" />
+        <Button x:Name="BtnWorld"
+                Content="world" />
+        <Button x:Name="BtnSession"
+                Content="session" />
+        <Button x:Name="BtnCaptureScreen"
+                Content="capture screen" />
+    </StackPanel>
 </Window>

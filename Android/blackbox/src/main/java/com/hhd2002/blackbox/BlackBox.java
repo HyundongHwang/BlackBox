@@ -129,16 +129,25 @@ public class BlackBox {
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 
-
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                while (true) {
-                    try {
-                        File externalCacheDir = _context.getExternalCacheDir();
+
+                try {
+                    CloudStorageAccount storageAccount = CloudStorageAccount.parse(_azureStorageConnectionString);
+                    CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
+                    CloudBlobContainer container = blobClient.getContainerReference("screencapture");
+                    boolean res = container.createIfNotExists();
+                    BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
+                    containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
+                    container.uploadPermissions(containerPermissions);
+                    File externalCacheDir = _context.getExternalCacheDir();
+
+                    while (true) {
+
                         File[] files = externalCacheDir.listFiles();
 
-                        for (File file: files) {
+                        for (File file : files) {
                             if (!file.getName().contains(_SCREEN_CAPTURE_FILE_PREFIX))
                                 continue;
 
@@ -146,14 +155,6 @@ public class BlackBox {
                             String dateStr = file.getName().substring(idx, idx + 6);
                             idx = idx + 6 + 1;
                             String timeStr = file.getName().substring(idx, idx + 6);
-
-                            CloudStorageAccount storageAccount = CloudStorageAccount.parse(_azureStorageConnectionString);
-                            CloudBlobClient blobClient = storageAccount.createCloudBlobClient();
-                            CloudBlobContainer container = blobClient.getContainerReference("screencapture");
-                            boolean res = container.createIfNotExists();
-                            BlobContainerPermissions containerPermissions = new BlobContainerPermissions();
-                            containerPermissions.setPublicAccess(BlobContainerPublicAccessType.CONTAINER);
-                            container.uploadPermissions(containerPermissions);
 
                             String blobName = String.format("%s/%s/%s-%s.png", _getHwId(_context), dateStr, _SCREEN_CAPTURE_FILE_PREFIX, timeStr);
                             CloudBlockBlob blob = container.getBlockBlobReference(blobName);
@@ -171,10 +172,13 @@ public class BlackBox {
                         }
 
                         Thread.sleep(3000);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
                     }
+
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
+
+                return null;
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
