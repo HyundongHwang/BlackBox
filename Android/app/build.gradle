@@ -11,10 +11,20 @@ android {
         versionName "1.0"
         multiDexEnabled true
     }
+    signingConfigs {
+        debug {
+            //signSha1HashBase64 : qXJ9+pysexGcqiGTMnJu8ay0cb8=
+            storeFile file('keystore/debug.keystore')
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
