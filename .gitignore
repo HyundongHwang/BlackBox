@@ -43,8 +43,19 @@ hs_err_pid*
 */*/.vs/*
 */*/*/.vs/*
 
+*/debug/*
+*/*/debug/*
+*/*/*/debug/*
+
+*/releasebuild/*
+*/*/release/*
+*/*/*/release/*
+
+
 *.idea*
 *.iml
 *securekeys*
+
+
 
 *.user
