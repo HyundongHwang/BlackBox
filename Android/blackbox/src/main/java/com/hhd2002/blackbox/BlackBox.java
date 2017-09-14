@@ -170,7 +170,7 @@ public class BlackBox {
                             file.delete();
                             String imgFilePath = file.getAbsolutePath();
                             String imgUrl = blob.getUri().toString();
-                            BlackBox.i("CAPTURESCREEN %s : %s", imgFilePath, imgUrl);
+                            BlackBox.i("CAPTURESCREEN\n%s\n%s", imgFilePath, imgUrl);
                         }
 
                         Thread.sleep(3000);
