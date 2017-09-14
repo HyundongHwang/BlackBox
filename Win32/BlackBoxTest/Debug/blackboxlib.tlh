@@ -1,0 +1,127 @@
+﻿// Created by Microsoft (R) C/C++ Compiler Version 14.11.25506.0 (d8228d35).
+//
+// c:\project\blackbox\win32\blackboxtest\debug\blackboxlib.tlh
+//
+// C++ source equivalent of Win32 type library BlackBoxLib.tlb
+// compiler-generated file created 09/14/17 at 11:15:39 - DO NOT EDIT!
+
+#pragma once
+#pragma pack(push, 8)
+
+#include <comdef.h>
+
+namespace BlackBoxLib {
+
+//
+// Forward references and typedefs
+//
+
+struct __declspec(uuid("7c718e74-cb75-4865-9fc8-dedb3a95aa7b"))
+/* LIBID */ __BlackBoxLib;
+struct /* coclass */ AzureTableLogEntity;
+struct /* coclass */ AzureTableSessionEntity;
+struct /* coclass */ BlackBox;
+struct /* coclass */ BlackBoxImpl;
+struct __declspec(uuid("c987e027-c0bd-3496-9556-b9037c9ab3dc"))
+/* dual interface */ IBlackBox;
+struct /* coclass */ LevelAndLog;
+struct __declspec(uuid("87a7ee87-06ce-3b91-8a6d-ebca257bf895"))
+/* dual interface */ _AzureTableLogEntity;
+struct __declspec(uuid("6409f2b5-3cdf-30f5-8dc6-8798b3a80ecc"))
+/* dual interface */ _AzureTableSessionEntity;
+struct __declspec(uuid("3fed4190-8783-3e90-aabd-bc1df8d22a5b"))
+/* dual interface */ _BlackBox;
+struct __declspec(uuid("46d88776-6bd3-3af2-a2b0-6c4ba31c0844"))
+/* dual interface */ _BlackBoxImpl;
+struct __declspec(uuid("5e31ad54-5551-3643-8145-c57dcc74a746"))
+/* dual interface */ _LevelAndLog;
+
+//
+// Smart pointer typedef declarations
+//
+
+_COM_SMARTPTR_TYPEDEF(IBlackBox, __uuidof(IBlackBox));
+_COM_SMARTPTR_TYPEDEF(_AzureTableLogEntity, __uuidof(_AzureTableLogEntity));
+_COM_SMARTPTR_TYPEDEF(_AzureTableSessionEntity, __uuidof(_AzureTableSessionEntity));
+_COM_SMARTPTR_TYPEDEF(_BlackBox, __uuidof(_BlackBox));
+_COM_SMARTPTR_TYPEDEF(_BlackBoxImpl, __uuidof(_BlackBoxImpl));
+_COM_SMARTPTR_TYPEDEF(_LevelAndLog, __uuidof(_LevelAndLog));
+
+//
+// Type library items
+//
+
+struct __declspec(uuid("fe47ea8a-c89c-37e0-b998-70095e66d734"))
+AzureTableLogEntity;
+    // [ default ] interface _AzureTableLogEntity
+    // interface _Object
+
+struct __declspec(uuid("0e43e610-3c85-3680-b6eb-5c2481f9b1b4"))
+AzureTableSessionEntity;
+    // [ default ] interface _AzureTableSessionEntity
+    // interface _Object
+
+struct __declspec(uuid("907b562a-e1ba-3d8c-908e-bf77d370cf45"))
+BlackBox;
+    // [ default ] interface _BlackBox
+    // interface _Object
+
+struct __declspec(uuid("42fceddd-2c1b-33eb-bd6b-09bf5a617f37"))
+BlackBoxImpl;
+    // [ default ] interface _BlackBoxImpl
+    // interface _Object
+    // interface IBlackBox
+
+struct __declspec(uuid("c987e027-c0bd-3496-9556-b9037c9ab3dc"))
+IBlackBox : IDispatch
+{
+    //
+    // Raw methods provided by interface
+    //
+
+      virtual HRESULT __stdcall Init (
+        /*[in]*/ BSTR azureStorageConnectionString ) = 0;
+      virtual HRESULT __stdcall CaptureScreen ( ) = 0;
+      virtual HRESULT __stdcall Flush ( ) = 0;
+      virtual HRESULT __stdcall e (
+        /*[in]*/ BSTR msg ) = 0;
+      virtual HRESULT __stdcall w (
+        /*[in]*/ BSTR msg ) = 0;
+      virtual HRESULT __stdcall i (
+        /*[in]*/ BSTR msg ) = 0;
+      virtual HRESULT __stdcall d (
+        /*[in]*/ BSTR msg ) = 0;
+      virtual HRESULT __stdcall v (
+        /*[in]*/ BSTR msg ) = 0;
+      virtual HRESULT __stdcall session (
+        /*[in]*/ BSTR sessionStr ) = 0;
+};
+
+struct __declspec(uuid("854add4d-b368-379f-9f6e-aaeab9591f13"))
+LevelAndLog;
+    // [ default ] interface _LevelAndLog
+    // interface _Object
+
+struct __declspec(uuid("87a7ee87-06ce-3b91-8a6d-ebca257bf895"))
+_AzureTableLogEntity : IDispatch
+{};
+
+struct __declspec(uuid("6409f2b5-3cdf-30f5-8dc6-8798b3a80ecc"))
+_AzureTableSessionEntity : IDispatch
+{};
+
+struct __declspec(uuid("3fed4190-8783-3e90-aabd-bc1df8d22a5b"))
+_BlackBox : IDispatch
+{};
+
+struct __declspec(uuid("46d88776-6bd3-3af2-a2b0-6c4ba31c0844"))
+_BlackBoxImpl : IDispatch
+{};
+
+struct __declspec(uuid("5e31ad54-5551-3643-8145-c57dcc74a746"))
+_LevelAndLog : IDispatch
+{};
+
+} // namespace BlackBoxLib
+
+#pragma pack(pop)

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>hhd2002.BlackBox</id>
+    <version>1.3.0</version>
+    <authors>HyundongHwang</authors>
+    <owners>HyundongHwang</owners>
+    <licenseUrl>https://raw.githubusercontent.com/HyundongHwang/BlackBox/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/HyundongHwang/BlackBox</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/HyundongHwang/BlackBox/master/blackbox-icon.jpg</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>BlackBox for .NET</description>
+    <releaseNotes>initail release</releaseNotes>
+    <copyright>Copyright 2017</copyright>
+    <tags>C# .NET BlackBox log logger logging</tags>
+  </metadata>
+</package>

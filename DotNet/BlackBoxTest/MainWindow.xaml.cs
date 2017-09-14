@@ -43,7 +43,7 @@ namespace BlackBoxTest
 
         private void BtnSession_Click(object sender, RoutedEventArgs e)
         {
-            BlackBox.session("h2d2002@naver.com from windows");
+            BlackBox.session("h2d2002@naver.com from .NET");
         }
 
         private void BtnCaptureScreen_Click(object sender, RoutedEventArgs e)

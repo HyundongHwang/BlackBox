@@ -119,9 +119,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BlackBox\BlackBox.csproj">
+    <ProjectReference Include="..\BlackBoxLib\BlackBoxLib.csproj">
       <Project>{7c718e74-cb75-4865-9fc8-dedb3a95aa7b}</Project>
-      <Name>BlackBox</Name>
+      <Name>BlackBoxLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

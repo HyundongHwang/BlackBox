@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26720.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBoxTest", "BlackBoxTest\BlackBoxTest.csproj", "{FE591FFD-1D50-44E2-B74A-EFE6D2361E0A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBox", "BlackBox\BlackBox.csproj", "{7C718E74-CB75-4865-9FC8-DEDB3A95AA7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBoxLib", "BlackBoxLib\BlackBoxLib.csproj", "{7C718E74-CB75-4865-9FC8-DEDB3A95AA7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
