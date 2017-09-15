@@ -33,6 +33,5 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.0.2'
     implementation 'com.microsoft.azure.android:azure-storage-android:1.0.0'
 }
