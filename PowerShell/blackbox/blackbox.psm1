@@ -54,6 +54,7 @@ function blackbox-init
     )
 
     $global:G_STORAGE_CONTEXT = New-AzureStorageContext $STORAGE_ACCOUNT_NAME -StorageAccountKey $STORAGE_ACCOUNT_KEY
+    return $global:G_STORAGE_CONTEXT
 }
 
 

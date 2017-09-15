@@ -99,21 +99,25 @@ LRESULT MainWnd::_On_ID_BTN(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHan
 
         auto bstrInit = CString(AZURE_STORAGE_CONNECTION).AllocSysString();
         m_pBlackBox->Init(bstrInit);
+        ::SysReleaseString(bstrInit);
     }
     else if (strBtnLabel == L"hello")
     {
         auto bstrMsg = CString(L"hello").AllocSysString();
         m_pBlackBox->d(bstrMsg);
+        ::SysReleaseString(bstrMsg);
     }
     else if (strBtnLabel == L"world")
     {
         auto bstrMsg = CString(L"world").AllocSysString();
         m_pBlackBox->i(bstrMsg);
+        ::SysReleaseString(bstrMsg);
     }
     else if (strBtnLabel == L"session")
     {
         auto bstrMsg = CString(L"h2d2002@naver.com from win32").AllocSysString();
         m_pBlackBox->session(bstrMsg);
+        ::SysReleaseString(bstrMsg);
     }
     else if (strBtnLabel == L"capture screen")
     {
