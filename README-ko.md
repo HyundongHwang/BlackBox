@@ -1,37 +1,37 @@
 <!-- TOC -->
 
-- [BlackBox Intro](#blackbox-intro)
-    - [Feature Introduction](#feature-introduction)
-    - [Good Scenario](#good-scenario)
-    - [storage naming rules](#storage-naming-rules)
-- [BlackBox realtime log, screencapture demos](#blackbox-realtime-log-screencapture-demos)
-- [Azure Storage Access Key Acquisition](#azure-storage-access-key-acquisition)
+- [BlackBox 소개](#blackbox-소개)
+    - [간략기능 소개](#간략기능-소개)
+    - [사용하기 좋은 시나리오](#사용하기-좋은-시나리오)
+    - [저장소 관리 규칙](#저장소-관리-규칙)
+- [BlackBox 실시간 로그, 화면캡쳐 데모영상](#blackbox-실시간-로그-화면캡쳐-데모영상)
+- [Azure Storage 계정키 발급받기](#azure-storage-계정키-발급받기)
 - [BlackBox for Android](#blackbox-for-android)
-    - [jitpack setting](#jitpack-setting)
-    - [Initialize](#initialize)
-    - [Write log, session, screen capture](#write-log-session-screen-capture)
-    - [Download sample apk](#download-sample-apk)
+    - [jitpack 설정](#jitpack-설정)
+    - [초기화](#초기화)
+    - [로그, 세션, 스크린캡쳐 기록](#로그-세션-스크린캡쳐-기록)
+    - [샘플 apk 다운로드](#샘플-apk-다운로드)
 - [BlackBox for .NET](#blackbox-for-net)
-    - [nuget setting](#nuget-setting)
-    - [initialize](#initialize)
-    - [Write log, session, screen capture](#write-log-session-screen-capture-1)
-    - [Download sample exe](#download-sample-exe)
+    - [nuget 설정](#nuget-설정)
+    - [초기화](#초기화-1)
+    - [로그, 세션, 스크린캡쳐 기록](#로그-세션-스크린캡쳐-기록-1)
+    - [샘플 exe 다운로드](#샘플-exe-다운로드)
 - [BlackBox for Win32](#blackbox-for-win32)
-    - [Registering .NET dll system](#registering-net-dll-system)
-    - [import tlb file](#import-tlb-file)
-    - [Initialize](#initialize-1)
-    - [Write log, session, screen capture](#write-log-session-screen-capture-2)
-    - [Download sample exe](#download-sample-exe-1)
+    - [.NET dll 시스템 등록](#net-dll-시스템-등록)
+    - [tlb 파일 임포트](#tlb-파일-임포트)
+    - [초기화](#초기화-2)
+    - [로그, 세션, 스크린캡쳐 기록](#로그-세션-스크린캡쳐-기록-2)
+    - [샘플 exe 다운로드](#샘플-exe-다운로드-1)
 - [BlackBox PowerShell Admin](#blackbox-powershell-admin)
-    - [Install from Powershell Gallery](#install-from-powershell-gallery)
-    - [Initialize](#initialize-2)
-    - [Search the log table](#search-the-log-table)
-    - [Log Search](#log-search)
-    - [Delete log table](#delete-log-table)
-    - [Session Search](#session-search)
-    - [Screen Capture Search](#screen-capture-search)
-    - [Delete screen capture](#delete-screen-capture)
-- [BlackBox development plan (the person who will help is very welcome)](#blackbox-development-plan-the-person-who-will-help-is-very-welcome)
+    - [Powershell Gallery 에서 설치](#powershell-gallery-에서-설치)
+    - [초기화](#초기화-3)
+    - [로그테이블 조회](#로그테이블-조회)
+    - [로그 조회](#로그-조회)
+    - [로그테이블 삭제](#로그테이블-삭제)
+    - [세션 조회](#세션-조회)
+    - [스크린캡쳐 조회](#스크린캡쳐-조회)
+    - [스크린캡쳐 삭제](#스크린캡쳐-삭제)
+- [BlackBox 개발계획 (도와주신다면 대단히 환영합니다.)](#blackbox-개발계획-도와주신다면-대단히-환영합니다)
 
 <!-- /TOC -->
 
@@ -41,46 +41,46 @@
 
 ![](https://raw.githubusercontent.com/HyundongHwang/BlackBox/master/blackbox-icon.jpg)
 
-[한국어로 보기](/README-ko.md)
+# BlackBox 소개
 
-# BlackBox Intro
-It was a log module that I used to make it for my company and was useful for several months. <br>
-By creating a single Azure Storage instance and registering your key, you can easily do text logging and screen capture in real time on Android, .NET, Win32 apps. <br>
-PullRequest is welcome because there are many deficiencies. <br>
-If you have any questions, please leave a message. <br>
+회사일로 필요해서 만들어서 몇달간 유용하게 사용하고 있던 로그모듈인데 라이브러리 형태로 정리했습니다. <br>
+Azure Storage 인스턴스를 한개 만들어서 키등록을 하면 쉽게 안드로이드, .NET, Win32 앱에서 텍스트로깅, 스크린캡쳐를 실시간으로 할 수 있습니다. <br>
+부족함이 많으니 PullRequest 환영입니다. <br>
+사용중 문의사항 있으면 글남겨 주세요. <br>
 
 
-## Feature Introduction
-- Collect log text, screen capture images, and collect them into the cloud storage every 10 seconds.
-- Using Azure Storage with CloudStorage and so it needs its AccessKey.
-- Provided in SDK form for easy use on Android, .NET, Win32 client.
-     - Android: Available as jitpack grade
-     - .NET: provided by package in nuget
-     - Win32: nuget provides package, import attached tlb and use it as COM
-- PowerShell supports log search/delete, session search, screen capture search/delete.
-     - Provided as a module in PowerShell Gallery
 
-## Good Scenario
-- When data flow is complicated in Client App, you have to find important clues in it.
-    - When the process of finding this clue occurs occasionally during operation and needs to be grasped in real time.
-- When business itself is more important than personal information protection like in-house service.
-    - `(Note !!!) Logging or screen capture of personal information without explicit user consent is illegal.`
-- When to use log text for various big data analysis.
-    - It manages log text in NOSQL DB. Naturally, it is more normalized and accessibility than analyzing text file on server.
-- I am building a large number of log texts at the same time,
-    - With Azure Storage, you can use the REST API to query, write, and delete the use of this repository, so there is no need to create and manage your own log server.
-    - Will not Azure Storage's servers handle much traffic?
-- When the capacity of the log text is too large to cause storage expansion issues, which wastes time and money.
-    - Azure Storage is cloud-based, so the capacity is of course unlimited
-    - Assuming you use about 10gb per month, you will be charged less than 1000 won.
+## 간략기능 소개
+- 로그텍스트, 스크린캡쳐이미지를 모아서 10초에 한번씩 클라우드 저장소로 모으는 기능.
+- 클라우드 저장소는 Azure Storage를 사용하고 있어서 그 접근키가 필요함.
+- 안드로이드, .NET, Win32 클라이언트에서 사용하기 쉽도록 SDK 형태로 제공함.
+    - 안드로이드 : jitpack 에서 gradle 로 제공
+    - .NET : nuget 에서 package 로 제공
+    - Win32 : nuget 에서 package 로 제공받고, 첨부된 tlb를 임포트해서 COM으로 사용
+- PowerShell 로 로그 조회/삭제, 세션 조회, 스크린캡쳐 조회/삭제 를 지원함.
+    - PowerShell Gallery 에서 모듈로 제공
+
+## 사용하기 좋은 시나리오
+- 클라이언트앱에서 데이타흐름이 복잡한데 그 흐름 안에서 중요한 단서를 찾아야 할때.
+    - 이 단서를 찾는 과정이 운영중 수시로 발생하고 실시간으로 파악해야 할때.
+- 사내서비스 처럼 개인정보보호보다는 업무자체가 더 중요할때.
+    - `그렇다고 해도 중요개인정보의 무분별한 로깅이나 무허가 스크린캡쳐는 안됨.`
+- 로그텍스트를 다양한 빅데이타 분석으로 활용해야 할때.
+    - 로그텍스트를 NOSQL DB 에서 관리하는 거라 당연히 서버에 텍스트파일로 분석하는 것보다 정규화 되어 있고 접근성도 높음.
+- 로그텍스트를 동시에 대량으로 쌓고 있는데 이 때문에 로그서버에 부하가 많이 걸릴때
+    - Azure Storage 를 사용하면 이 저장소 사용에 대한 조회/쓰기/삭제 를 REST API로 사용할 수 있어서 자체적으로 로그서버를 만들고 관리하는 부담이 없음.
+    - 많은 트래픽 처리도 자기가 만든서버보다는 Azure Storage의 서버가 잘 처리해 주지 않을까?
+- 로그텍스트의 용량이 너무 커져서 스토리지 증설이슈가 발생하고 그 때문에 시간과 비용이 낭비될때.
+    - Azure Storage 는 클라우드 기반이니 용량은 당연히 무제한이고
+    - 한달에 10gb 정도 사용한다고 가정했을때 1000원 이내로 과금될 뿐임.
+
+## 저장소 관리 규칙
+- 로그텍스트
+    - Azure Storage Table 를 이용해서 NOSQL DB로 관리함.
+    - 클라이언트앱별로 매일 한개의 테이블을 생성함.
+    - `log{DEVICE-ID}date{yyMMdd}` 로 디바이스당 모든 날짜별로 테이블이 따로 생성됨.
+        - 조회/삭제가 디바이스별 날짜별로 지원됨
     
-## storage naming rules
-- log text
-     - It is managed by NOSQL DB using Azure Storage Table.
-     - Generate one table per client app.
-     - `log {DEVICE-ID} date {yyMMdd}` creates a table for every date per device.
-         - search/delete supported by device by date
-
 ```powershell
 CloudTable                                           
 
@@ -93,10 +93,10 @@ logD781889DEC1C6F8B177CEA5E11B0FC220D492A6Ddate170915
 logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170913
 ```
 
-- session
-     - Also managed by NOSQL DB using Azure Storage Table.
-     - It matches client app's hardware ID and session information
-         - When log analysis is needed, the session function is also needed because it is searched by session information such as service ID rather than hardware ID.
+- 세션
+    - 역시 Azure Storage Table 를 이용해서 NOSQL DB로 관리함.
+    - 클라이언트앱의 하드웨어ID와 세션정보를 매칭해줌
+        - 로그분석을 해야 할때는 하드웨어ID보다는 서비스ID등 세션정보로 찾게 되기 때문에 필요함.
 
 ```powershell
 RowKey                                   SessionStr
@@ -107,35 +107,35 @@ D781889DEC1C6F8B177CEA5E11B0FC220D492A6D h2d2002@naver.com from win32
 DC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79 h2d2002@naver.com from win32
 ```
 
-- Screen capture
-     - Azure Storage Blob allows you to manage and search/delete files.
-     - It manages folders by client by date.
-         - `{DEVICE-ID} / {yyMMdd} / blackbox-screencapture- {HHmmss} - {RANDOM-GUID} .png`
-     - Random GUID was appended to the url. And it makes that it is difficult to hack through url prediction. (Instead the url is a little bit long :( )
+- 스크린캡쳐
+    - Azure Storage Blob 을 이용해서 파일로 관리하고 조회/삭제 지원함.
+    - 클라이언트별 날짜별로 폴더 나눠서 관리함.
+        - `{DEVICE-ID}/{yyMMdd}/blackbox-screencapture-{HHmmss}-{RANDOM-GUID}.png`
+    - random GUID 를 url에 뒤에 붙여서 url예측을 통한 해킹을 어렵게 했음. (그대신 url이 좀 김 --;;)
 
 <br>
 <br>
 <br>
 
-# BlackBox realtime log, screencapture demos
+# BlackBox 실시간 로그, 화면캡쳐 데모영상
 
-- Android App
+- 안드로이드 앱
     - https://www.youtube.com/watch?v=HhdLYEhU-Zc
 
-- .NET App
+- .NET 앱
     - https://www.youtube.com/watch?v=VNZTxJAMqn8
 
-- Win32 App
+- Win32 앱
     - https://www.youtube.com/watch?v=SHLa6vcTgVk
 
 <br>
 <br>
 <br>
 
-# Azure Storage Access Key Acquisition
+# Azure Storage 계정키 발급받기
 
 - https://hyundonghwang.github.io/2017/09/15/Azure-Storage-Service-%EC%9D%B8%EC%8A%A4%ED%84%B4%EC%8A%A4-%EB%A7%8C%EB%93%A4%EA%B8%B0/
-- If you want to use the account key included in the sample app for testing, please contact me separately ~ (hhd2002@kakaotalk or h2d2002@facebook)
+- 테스트를 위해 샘플앱에 포함된 계정키를 원하시는 분은 따로 연락을 주세요~ (카톡아이디 : hhd2002)
 
 <br>
 <br>
@@ -143,9 +143,9 @@ DC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79 h2d2002@naver.com from win32
 
 # BlackBox for Android
 
-## jitpack setting
+## jitpack 설정
 - https://jitpack.io/#HyundongHwang/BlackBox
-- Add `jitpack.io` repository to the root's `/build.gradle` file
+- 루트의 `/build.gradle` 파일에 `jitpack.io` 저장소 추가
 
 ```groovy
 allprojects {
@@ -156,8 +156,8 @@ allprojects {
 }
 ```
 
-- Add dependencies to the modules you want to use
-    - ex) `/app/build.gradle`
+- 사용대상이 되는 모듈에 종속성 추가
+    - 예) `/app/build.gradle`
 
 ```groovy
 dependencies {
@@ -165,8 +165,8 @@ dependencies {
 }
 ```
 
-## Initialize
-- Initialized using Azure Storage Access Key.
+## 초기화
+- Azure Storage 키를 이용해서 초기화 함.
 
 ```java
 public class MainApplication extends MultiDexApplication {
@@ -179,7 +179,7 @@ public class MainApplication extends MultiDexApplication {
 ```
 
 
-## Write log, session, screen capture
+## 로그, 세션, 스크린캡쳐 기록
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 
-## Download sample apk
+## 샘플 apk 다운로드
 - https://github.com/HyundongHwang/BlackBox/blob/master/Android/BlackboxTest-170915-0200.apk
 
 <br>
@@ -216,13 +216,13 @@ public class MainActivity extends AppCompatActivity {
 # BlackBox for .NET
 - https://www.nuget.org/packages/hhd2002.BlackBox
 
-## nuget setting
+## nuget 설정
 
 ```powershell
 PM> Install-Package hhd2002.BlackBox -Version 1.3.0
 ```
 
-## initialize
+## 초기화
 
 ```c#
 public partial class App : Application
@@ -235,7 +235,7 @@ public partial class App : Application
 }
 ```
 
-## Write log, session, screen capture
+## 로그, 세션, 스크린캡쳐 기록
 
 ```c#
 public partial class MainWindow : Window
@@ -262,7 +262,7 @@ public partial class MainWindow : Window
 }
 ```
 
-## Download sample exe
+## 샘플 exe 다운로드
 
 - https://github.com/HyundongHwang/BlackBox/blob/master/DotNet/Scripts/BlackBoxTestDeploy-1709141827.zip
 
@@ -272,9 +272,9 @@ public partial class MainWindow : Window
 
 # BlackBox for Win32
 
-## Registering .NET dll system
-- .NET dll will be called as COM interface.
-- This is usually done in the installer, but in this case it's a test, so I wrote it in c ++ code.
+## .NET dll 시스템 등록
+- .NET dll을 COM interface로 호출할것이라 사용전 시스템 등록이 필요함.
+- 보통 설치프로그램에서 이뤄질 작업인데 테스트앱이라 c++ 코드에서 작성했음.
 
 ```c++
 wchar_t wBlackBoxDllPath[MAX_PATH] = { 0, };
@@ -286,9 +286,9 @@ HANDLE child = ::ShellExecute(this->m_hWnd, L"runas", L"C:\\windows\\Microsoft.N
 ::WaitForSingleObject(child, INFINITE);
 ```
 
-## import tlb file
-- .NET DLL is COM exported in advance, and you can create tlb file. When you import, tlh file is generated when compiling, so it can be used as strong type in c ++ code.
-- If you do not understand me, download the already created file from the link below and just write #import syntax.
+## tlb 파일 임포트
+- .NET dll 을 미리 COM export 해 두었고 이를 통해 tlb 파일을 만들수 있고, 임포트하면 컴파일 할때 tlh 파일이 생겨서 c++ 코드에서 강타입으로 사용가능하게 됨.
+- 무슨 얘기인지 모르겠다면ㅠㅠ 이미 만들어진 파일을 아래 링크에서 다운로드 받고 #import 구문만 작성하면됨.
     - https://github.com/HyundongHwang/BlackBox/raw/master/Win32/BlackBoxTest/BlackBoxLib.tlb
 - `stdafx.h`
 
@@ -297,7 +297,7 @@ HANDLE child = ::ShellExecute(this->m_hWnd, L"runas", L"C:\\windows\\Microsoft.N
 using namespace BlackBoxLib;
 ```
 
-## Initialize
+## 초기화
 
 ```c++
 IBlackBoxPtr m_pBlackBox;
@@ -313,7 +313,7 @@ m_pBlackBox->Init(bstrInit);
 ::SysReleaseString(bstrInit);
 ```
 
-## Write log, session, screen capture
+## 로그, 세션, 스크린캡쳐 기록
 
 ```c++
 if (strBtnLabel == L"hello")
@@ -336,7 +336,7 @@ else if (strBtnLabel == L"session")
 }
 ```
 
-## Download sample exe
+## 샘플 exe 다운로드
 
 - https://github.com/HyundongHwang/BlackBox/blob/master/Win32/Scripts/BlackBoxTestDeploy-1709141128.zip
 
@@ -346,7 +346,7 @@ else if (strBtnLabel == L"session")
 
 # BlackBox PowerShell Admin
 
-## Install from Powershell Gallery
+## Powershell Gallery 에서 설치
 
 - https://www.powershellgallery.com/packages/blackbox
 
@@ -367,7 +367,7 @@ Function        blackbox-remove-screencapture                      1.3.2      bl
 Function        blackbox-remove-table                              1.3.2      blackbox
 ```
 
-## Initialize
+## 초기화
 
 ```powershell
 PS> $STORAGE_ACCOUNT_NAME = "blackboxtest"
@@ -392,8 +392,8 @@ ConnectionString   : BlobEndpoint=https://blackboxtest.blob.core.windows.net/;Qu
 ExtendedProperties : {}
 ```
 
-## Search the log table
-- Search all tables
+## 로그테이블 조회
+- 모든 테이블 조회
 
 ```powershell
 PS> blackbox-get-table-list
@@ -405,7 +405,7 @@ log71384680ffe50ddadate170912                         https://blackboxtest.table
 logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170912 https://blackboxtest.table.core.windows.net/logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170912 
 ```
 
-- Table Search + Filtering
+- 테이블 조회 + 필터링
 
 ```powershell
 PS> blackbox-get-table-list -FILTER_STR 170912
@@ -416,9 +416,9 @@ log71384680ffe50ddadate170912                         https://blackboxtest.table
 logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170912 https://blackboxtest.table.core.windows.net/logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170912
 ```
 
-## Log Search
+## 로그 조회
 
-- Real-time log viewing
+- 실시간 로그보기
 
 ```powershell
 PS> blackbox-get-log -TABLE_NAME log71384680ffe50ddadate170912 -KEEP_MONITOR
@@ -432,7 +432,7 @@ wait ...
 wait ...
 ```
 
-- Save log to file
+- 로그를 파일로 저장
 
 ```
 PS> blackbox-get-log -TABLE_NAME log57C7B14B1932357EED39FED1CA8409B11E658973date170913 | Out-File today-my-pc-log.log
@@ -443,9 +443,9 @@ Mode                LastWriteTime         Length Name
 -a----     2017-09-15  오전 11:18           2694 today-my-pc-log.log
 ```
 
-## Delete log table
+## 로그테이블 삭제
 
-- Delete table assignment
+- 테이블 지정 삭제
 
 ```powershell
 PS> blackbox-remove-table -TABLE_NAME log57C7B14B1932357EED39FED1CA8409B11E658973date170913
@@ -455,7 +455,7 @@ Remove table and all content in it: log57C7B14B1932357EED39FED1CA8409B11E658973d
 [Y] 예(Y)  [N] 아니요(N)  [S] 일시 중단(S)  [?] 도움말 (기본값은 "Y"): y
 ```
 
-- Delete all logs except those within n days
+- n일 이내로만 남기고 모두 삭제
 
 ```powershell
 PS> blackbox-remove-table -REMAIN_PERIOD_IN_DAYS 1
@@ -464,9 +464,9 @@ logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170913
 Do you really delete these? [y/n]: y
 ```
 
-## Session Search
+## 세션 조회
 
-- Search all sessions
+- 모든 세션 조회
 
 ```powershell
 PS> blackbox-get-session
@@ -478,7 +478,7 @@ D781889DEC1C6F8B177CEA5E11B0FC220D492A6D h2d2002@naver.com from win32
 DC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79 h2d2002@naver.com from win32
 ```
 
-- Session search + filtering
+- 세션 조회 + 필터링
 
 ```powershell
 PS C:\temp> blackbox-get-session -FILTER_STR "from android"
@@ -488,9 +488,9 @@ RowKey           SessionStr                     FilteredStr
 ```
 
 
-## Screen Capture Search
+## 스크린캡쳐 조회
 
-- Search by (device ID + date)
+- (디바이스ID + 날짜)로 조회
 
 ```powershell
 PS C:\temp> blackbox-get-screencapture 71384680ffe50dda 170915
@@ -504,9 +504,9 @@ https://blackboxtest.blob.core.windows.net/screencapture/71384680ffe50dda/170915
 ```
 
 
-## Delete screen capture
+## 스크린캡쳐 삭제
 
-- Delete with (Device + Date)
+- (디바이스 + 날짜)로 삭제
 
 ```powershell
 PS > blackbox-remove-screencapture -DEVICE_ID 71384680ffe50dda -DATE_STR 170911
@@ -514,7 +514,7 @@ PS > blackbox-remove-screencapture -DEVICE_ID 71384680ffe50dda -DATE_STR 170911
 Do you really delete these? [y/n]: y
 ```
 
-- Delete all logs except those within n days
+- n일 이내로만 남기고 모두 삭제
 
 ```powershell
 PS C:\project\blackbox\PowerShell> blackbox-remove-screencapture -REMAIN_PERIOD_IN_DAYS 2
@@ -535,15 +535,15 @@ Do you really delete these? [y/n]: y
 <br>
 <br>
 
-# BlackBox development plan (the person who will help is very welcome)
+# BlackBox 개발계획 (도와주신다면 대단히 환영합니다.)
 
-- WEB admin tool development
-     - The admin tool only has PowerShell, which is powerful, but it is inaccessible.
-     - I would like to make it a pure jquery ajax app that connects Azure Storage Service directly without creating a separate server so that I can use it for general purpose.
+- WEB admin 툴 개발
+    - admin 툴이 PowerShell만 있는데 강력하긴 하지만 아무래도 접근성이 떨어짐.
+    - 범용적으로 사용할 수 있게 이것도 따로 서버 만들지 않고 Azure Storage Service를 직접연결해서 순수 jquery ajax로 만들예정.
 
-- Develop SDK for iOS
-     - I want to do it, but I really need someone to help.
-     - I do not even have a MacBook and an iPhone.
+- iOS 용 SDK 개발
+    - 하고는 싶지만 정말 누가 도와줘야 됨.
+    - 맥북, 아이폰 없음.
 
 <br>
 <br>

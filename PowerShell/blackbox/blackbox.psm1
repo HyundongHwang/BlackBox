@@ -391,7 +391,10 @@ function blackbox-remove-table
             return
         }
 
-        $tableList | Remove-AzureStorageTable -Name $_.Name -Context $global:G_STORAGE_CONTEXT
+        $tableList | 
+        foreach { 
+            Remove-AzureStorageTable -Name $_.Name -Context $global:G_STORAGE_CONTEXT -Force
+        }
     }
 }
 
@@ -641,7 +644,7 @@ function blackbox-remove-screencapture
 
     $blobList | 
     foreach { 
-        Remove-AzureStorageBlob -Context $global:G_STORAGE_CONTEXT -Blob $_.Name -Container screencapture
+        Remove-AzureStorageBlob -Context $global:G_STORAGE_CONTEXT -Blob $_.Name -Container screencapture -Force
     }
 }
 
