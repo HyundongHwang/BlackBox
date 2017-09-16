@@ -54,25 +54,25 @@ If you have any questions, please leave a message. <br>
 - Collect log text, screen capture images, and collect them into the cloud storage every 10 seconds.
 - Using Azure Storage with CloudStorage and so it needs its AccessKey.
 - Provided in SDK form for easy use on Android, .NET, Win32 client.
-     - Android: Available as jitpack grade
-     - .NET: provided by package in nuget
-     - Win32: nuget provides package, import attached tlb and use it as COM
+    - Android: Available as jitpack grade
+    - .NET: provided by package in nuget
+    - Win32: nuget provides package, import attached tlb and use it as COM
 - PowerShell supports log search/delete, session search, screen capture search/delete.
-     - Provided as a module in PowerShell Gallery
+    - Provided as a module in PowerShell Gallery
 
 ## Good Scenario
 - When data flow is complicated in Client App, you have to find important clues in it.
-    - When the process of finding this clue occurs occasionally during operation and needs to be grasped in real time.
+    - When the process of finding this clue occurs occasionally during operation and needs to be grasped in real time.
 - When business itself is more important than personal information protection like in-house service.
-    - `(Note !!!) Logging or screen capture of personal information without explicit user consent is illegal.`
+    - `(Note !!!) Logging or screen capture of personal information without explicit user consent is illegal.`
 - When to use log text for various big data analysis.
-    - It manages log text in NOSQL DB. Naturally, it is more normalized and accessibility than analyzing text file on server.
+    - It manages log text in NOSQL DB. Naturally, it is more normalized and accessibility than analyzing text file on server.
 - I am building a large number of log texts at the same time,
-    - With Azure Storage, you can use the REST API to query, write, and delete the use of this repository, so there is no need to create and manage your own log server.
-    - Will not Azure Storage's servers handle much traffic?
+    - With Azure Storage, you can use the REST API to query, write, and delete the use of this repository, so there is no need to create and manage your own log server.
+    - Will not Azure Storage's servers handle much traffic?
 - When the capacity of the log text is too large to cause storage expansion issues, which wastes time and money.
-    - Azure Storage is cloud-based, so the capacity is of course unlimited
-    - Assuming you use about 10gb per month, you will be charged less than 1000 won.
+    - Azure Storage is cloud-based, so the capacity is of course unlimited
+    - Assuming you use about 10gb per month, you will be charged less than 1000 won.
     
 ## storage naming rules
 - log text
