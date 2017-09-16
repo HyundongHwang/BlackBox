@@ -76,10 +76,10 @@ If you have any questions, please leave a message. <br>
     
 ## storage naming rules
 - log text
-     - It is managed by NOSQL DB using Azure Storage Table.
-     - Generate one table per client app.
-     - `log {DEVICE-ID} date {yyMMdd}` creates a table for every date per device.
-         - search/delete supported by device by date
+    - It is managed by NOSQL DB using Azure Storage Table.
+    - Generate one table per client app.
+    - `log {DEVICE-ID} date {yyMMdd}` creates a table for every date per device.
+        - search/delete supported by device by date
 
 ```powershell
 CloudTable                                           
@@ -94,9 +94,9 @@ logDC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79date170913
 ```
 
 - session
-     - Also managed by NOSQL DB using Azure Storage Table.
-     - It matches client app's hardware ID and session information
-         - When log analysis is needed, the session function is also needed because it is searched by session information such as service ID rather than hardware ID.
+    - Also managed by NOSQL DB using Azure Storage Table.
+    - It matches client app's hardware ID and session information
+        - When log analysis is needed, the session function is also needed because it is searched by session information such as service ID rather than hardware ID.
 
 ```powershell
 RowKey                                   SessionStr
@@ -108,10 +108,10 @@ DC6E48F4A8E2E15A245DB4CA6DEFDC4902714C79 h2d2002@naver.com from win32
 ```
 
 - Screen capture
-     - Azure Storage Blob allows you to manage and search/delete files.
-     - It manages folders by client by date.
-         - `{DEVICE-ID} / {yyMMdd} / blackbox-screencapture- {HHmmss} - {RANDOM-GUID} .png`
-     - Random GUID was appended to the url. And it makes that it is difficult to hack through url prediction. (Instead the url is a little bit long :( )
+    - Azure Storage Blob allows you to manage and search/delete files.
+    - It manages folders by client by date.
+        - `{DEVICE-ID} / {yyMMdd} / blackbox-screencapture- {HHmmss} - {RANDOM-GUID} .png`
+    - Random GUID was appended to the url. And it makes that it is difficult to hack through url prediction. (Instead the url is a little bit long :( )
 
 <br>
 <br>
@@ -538,12 +538,12 @@ Do you really delete these? [y/n]: y
 # BlackBox development plan (the person who will help is very welcome)
 
 - WEB admin tool development
-     - The admin tool only has PowerShell, which is powerful, but it is inaccessible.
-     - I would like to make it a pure jquery ajax app that connects Azure Storage Service directly without creating a separate server so that I can use it for general purpose.
+    - The admin tool only has PowerShell, which is powerful, but it is inaccessible.
+    - I would like to make it a pure jquery ajax app that connects Azure Storage Service directly without creating a separate server so that I can use it for general purpose.
 
 - Develop SDK for iOS
-     - I want to do it, but I really need someone to help.
-     - I do not even have a MacBook and an iPhone.
+    - I want to do it, but I really need someone to help.
+    - I do not even have a MacBook and an iPhone.
 
 <br>
 <br>
